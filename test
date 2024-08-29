@@ -1,0 +1,28 @@
+# Use the official Python image from the Docker Hub
+FROM python:3.9-slim-buster
+
+# Set environment variables
+ENV AIRFLOW_HOME=/opt/airflow
+ENV PYTHONPATH=${AIRFLOW_HOME}
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    curl \
+    gnupg \
+    && apt-get clean
+
+# Install Airflow and its dependencies
+RUN pip install --no-cache-dir apache-airflow[celery,postgres,redis]==2.7.2
+
+# Copy and initialize the Airflow configuration
+COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+
+# Initialize the Airflow database
+RUN airflow db init
+
+# Expose ports for Airflow webserver
+EXPOSE 8080
+
+# Start Airflow services
+CMD ["sh", "-c", "airflow scheduler & airflow webserver"]
