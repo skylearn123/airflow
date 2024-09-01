@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Prompt for Credentials') {
+            steps {
+                script {
+                    // Prompt user for input
+                    def userInput = input(
+                        id: 'userInput', 
+                        message: 'Enter credentials to continue',
+                        parameters: [
+                            string(defaultValue: '', description: 'Username', name: 'USERNAME'),
+                            password(defaultValue: '', description: 'Password', name: 'PASSWORD')
+                        ]
+                    )
+
+                    // Validate credentials (Replace with your validation logic)
+                    def isValid = validateCredentials(userInput.USERNAME, userInput.PASSWORD)
+                    if (!isValid) {
+                        error("Invalid credentials. Aborting...")
+                    }
+                }
+            }
+        }
+
+        stage('Run Job') {
+            steps {
+                echo 'Running the job...'
+                // Add your job steps here
+            }
+        }
+    }
+}
+
+// Sample function to validate credentials
+// Replace with actual validation logic
+def validateCredentials(username, password) {
+    // For demonstration purposes, let's assume the valid credentials are user: admin, pass: admin123
+    return username == 'admin' && password == 'admin123'
+}
